@@ -1,0 +1,115 @@
+[
+  {
+    "name": "iphone",
+    "price": 154,
+    "featured": true,
+    "category":"Mobile",
+    "company": "apple"
+    
+  },
+  {
+    "name": "iphone10",
+    "price": 1154,
+    "featured": true,
+    "category":"Mobile",
+    "company": "apple"
+  },
+  {
+    "name": "watch",
+    "price": 204,
+    "category":"smartwatch",
+    "company": "apple"
+  },
+  {
+    "name": "watch10",
+    "price": 304,
+    "category":"smartwatch",
+    "company": "apple"
+  },
+  {
+    "name": "s20",
+    "price": 404,
+    "category":"Mobile",
+    "company": "samsung"
+  },
+  {
+    "name": "s20",
+    "price": 505,
+    "category":"Mobile",
+    "company": "samsung"
+  },
+  {
+    "name": "dell gaming",
+    "price": 501,
+     "category":"gamingconsole",
+    "company": "dell"
+  },
+  {
+    "name": "mi20",
+    "price": 701,
+    "category":"Assessory",
+    "company": "mi"
+  },{
+    "name": "watch20",
+    "price": 314,
+    "category":"smartwatch",
+    "company": "apple"
+  },
+  {
+    "name": "watch40 plus",
+    "price": 304,
+    "category":"smartwatch",
+    "company": "apple"
+  },{
+    "name": "watch ultra",
+    "price": 404,
+    "category":"smartwatch",
+    "company": "apple"
+  },{
+    "name": "watch10 plus",
+    "price": 504,
+    "category":"smartwatch",
+    "company": "apple"
+  },
+  {
+    "name": "handfree",
+    "price": 101,
+    "category":"Assessory",
+    "company": "mi"
+  },
+  {
+    "name": "ear buds",
+    "price": 301,
+    "category":"Assessory",
+    "company": "apple"
+  },
+  {
+    "name": "band",
+    "price": 100,
+    "category":"Assessory",
+    "company": "samsung"
+  },
+  {
+    "name": "screen protector",
+    "price": 101,
+    "category":"Assessory",
+    "company": "mi"
+  },
+  {
+    "name": "ps2",
+    "price": 501,
+     "category":"gamingconsole",
+    "company": "dell"
+  },{
+    "name": "ps3",
+    "price": 501,
+     "category":"gamingconsole",
+    "company": "dell"
+  },
+  {
+    "name": "ps5",
+    "price": 501,
+     "category":"gamingconsole",
+    "company": "dell"
+  }
+]

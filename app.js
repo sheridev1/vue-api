@@ -48,37 +48,36 @@ io.on('connection', (socket) => {
   console.log('A user connected');
 
   // Handle user joining a room
-  socket.on('join', async (userId) => {
+  socket.on('join', async (userId, username) => {
+    console.log("Received join request. User ID:", userId, "Username:", username);
     const userRoom = `user_${userId}`;
     socket.join(userRoom);
-    activeRooms[userRoom] = { id: userId, name: `User ${userId}` }; // Customize as needed
+    activeRooms[userRoom] = { id: userId, name: username }; // Customize as needed
     io.to('admin').emit('activeRooms', activeRooms);
-    console.log(`User with ID ${userId} joined room ${userRoom}`);
-
+    console.log(`User with ID ${userId} and username ${username} joined room ${userRoom}`);
 
     const messages = await Message.find({ userId }).sort('timestamp');
-    socket.emit('previousMessages', messages);
+    socket.emit('previousMessages', { userId, messages });
   });
 
   // Handle user message
   socket.on('message', async (data) => {
-    const { userId, message } = data;
-    const newMessage = new Message({ userId, message, sentBy: 'user' });
+    const { userId, message, username } = data;
+    const newMessage = new Message({ userId, message, sentBy: 'user', username });
     await newMessage.save();
 
-    io.to('admin').emit('message', { userId, message });
-    console.log(`Message from user ${userId}: ${message}`);
-
+    io.to('admin').emit('message', { userId, message, username });
+    console.log(`Message from user ${userId} (${username}): ${message}`);
   });
 
   // Handle admin message
   socket.on('adminMessage', async (data) => {
     const { userId, message } = data;
     const userRoom = `user_${userId}`;
-    const newMessage = new Message({ userId, message, sentBy: 'admin' });
+    const newMessage = new Message({ userId, message, sentBy: 'admin', username: 'Admin' });
     await newMessage.save();
 
-    io.to(userRoom).emit('message', { message });
+    io.to(userRoom).emit('message', { message, username: 'Admin' });
     console.log(`Message to user ${userId}: ${message}`);
   });
 
@@ -89,13 +88,12 @@ io.on('connection', (socket) => {
     console.log('Admin joined the admin room');
   });
 
-
   // Handle fetching messages for a specific user (requested by admin)
   socket.on('fetchMessages', async (userId) => {
     const messages = await Message.find({ userId }).sort('timestamp');
-    socket.emit('previousMessages', messages);
+    socket.emit('previousMessages', { userId, messages });
   });
-  
+
   // Handle user/admin disconnection
   socket.on('disconnect', () => {
     let userId = null;
@@ -109,6 +107,7 @@ io.on('connection', (socket) => {
     console.log(`User with ID ${userId} disconnected`);
   });
 });
+
 // Start function to connect to database and start server
 const start = async () => {
   try {

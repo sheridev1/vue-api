@@ -1,22 +1,36 @@
 const express = require('express');
 const router = express.Router();
-const { getAllProducts, findProducts, getAllProductsByID, addReview, getReviews, checkUserReview } = require("../controllers/products")
-const { signUp, signIn } = require("../controllers/user")
+const { getAllProducts, findProducts, getAllProductsByID, addReview, getReviews, checkUserReview, addProduct, upload, getmetaData, deleteProduct, editProduct } = require("../controllers/products")
+const { signUp, signIn, getAllUsers, deleteUser,EditUser } = require("../controllers/user")
 const { addtocart, getData, removeData } = require("../controllers/addtocart")
 const { createOrder } = require("../controllers/order")
-const {getMessages}= require("../controllers/messages")
+const { getMessages } = require("../controllers/messages")
 const authmiddleware = require("../middleware/authmiddleware")
+const { checkRole }=require("../middleware/roleMiddleware")
 
 router.route("/product").get(getAllProductsByID)
 router.route("/products").get(getAllProducts);
 router.route("/products/filters").get(findProducts);
+//add product
+router.post('/products/add', addProduct);
+//get meta data
+router.get("/products/metadata", getmetaData)
+//delete product
+router.delete("/products/:id",checkRole(['admin']) ,deleteProduct);
+//edit product
+router.put("/products/:id", checkRole(['admin','editor']),editProduct);
+
 
 
 //SignUp
 router.post("/signup", signUp);
 router.post("/signin", signIn);
-
-
+//getUser
+router.get("/getusers", getAllUsers)
+//deleteUser
+router.delete("/user/:id",checkRole(['admin']),deleteUser)
+//Edit User
+router.put("/user/:id",checkRole(['admin','editor']),EditUser)
 
 //add to cart
 router.post("/cart", addtocart);
@@ -35,7 +49,7 @@ router.post("/products/checkuser", checkUserReview)
 //order
 router.post('/order', authmiddleware, createOrder)
 
-
+//chat
 router.get("/chat", getMessages)
 
 

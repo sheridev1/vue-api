@@ -1,6 +1,100 @@
 const { query } = require("express");
 const Product = require("../models/products");
 const Review = require("../models/review");
+const multer = require('multer');
+const path = require('path');
+
+
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Adjust destination folder as per your setup
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, `${uniqueSuffix}${ext}`);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+
+//add products
+const addProduct = async (req, res) => {
+    try {
+        const { name, price, featured, category, company } = req.body;
+
+        const newProduct = new Product({
+            name,
+            price,
+            featured,
+            category,
+            company
+        });
+
+        await newProduct.save();
+
+        res.status(201).json({ message: 'Product added successfully', product: newProduct });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+
+}
+
+
+
+//fetch company
+const getmetaData = async (req, res) => {
+    try {
+        const categories = await Product.distinct('category');
+        const companies = await Product.distinct('company');
+
+        res.status(200).json({ categories, companies });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+//delete product
+const deleteProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        await product.deleteOne();
+        res.json({ message: 'Product deleted' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+
+
+//edit product 
+const editProduct=async(req,res)=>{
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ message: 'Product not found' });
+    
+        product.name = req.body.name || product.name;
+        product.price = req.body.price || product.price;
+        product.featured = req.body.featured !== undefined ? req.body.featured : product.featured;
+        product.category = req.body.category || product.category;
+        product.company = req.body.company || product.company;
+    
+        const updatedProduct = await product.save();
+        res.json(updatedProduct);
+      } catch (err) {
+        res.status(400).json({ message: err.message });
+      }
+}
+
 
 const getAllProductsByID = async (req, res) => {
     const myData = await Product.findById(req.query.id).populate('reviews');
@@ -110,13 +204,13 @@ const getReviews = async (req, res) => {
 const checkUserReview = async (req, res) => {
     try {
         const { product, user } = req.body;
-        const existingReview = await Review.findOne({ product, user }); 
+        const existingReview = await Review.findOne({ product, user });
         if (existingReview) {
-            return res.json({ message:"Already entered",hasReviewed: true });
+            return res.json({ message: "Already entered", hasReviewed: true });
         } else {
-            return res.json({ message:"No entered", hasReviewed: false });
+            return res.json({ message: "No entered", hasReviewed: false });
         }
-    } catch (error) { 
+    } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal server error' });
     }
@@ -124,4 +218,4 @@ const checkUserReview = async (req, res) => {
 
 
 
-module.exports = { getAllProducts, findProducts, getAllProductsByID, addReview, getReviews , checkUserReview}
+module.exports = { getAllProducts, findProducts, getAllProductsByID, addReview, getReviews, checkUserReview, addProduct, upload, getmetaData, deleteProduct, editProduct }

@@ -18,6 +18,9 @@ const productSchema = new mongoose.Schema({
         default: 'Mobile'
 
     },
+    image:{
+        type:String
+    },
     rating: {
         type: Number,
         default: 4.9

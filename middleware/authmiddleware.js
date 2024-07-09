@@ -4,14 +4,10 @@ require("dotenv").config()
 
 
 const authmiddleware=async(req,res,next)=>{
-
     const token=req.header('Authorization');
-
-
     if(!token){
         return res.status(401).json({ msg: 'No token, authorization denied' });
     }
-
     try {
         const parseToken=token.split(' ')[1];
         
@@ -26,6 +22,14 @@ const authmiddleware=async(req,res,next)=>{
 
 }
 
+const verifyRole = (roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return res.status(403).json({ error: 'Access Denied' });
+        }
+        next();
+    };
 
+}
 
 module.exports=authmiddleware

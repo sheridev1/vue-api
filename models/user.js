@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
             'Please provide a valid email'
         ]
     },
+    role: { type: String, enum: ['admin', 'client', 'editor'], required: true }
     //cart: [
     //    {
     //        product: { type: mongoose.Schema.ObjectId, ref: 'Product' },
@@ -53,26 +54,26 @@ userSchema.pre('save', async function (next) {
 
 
 
-    // json web token
-    userSchema.methods.generateToken = async function () {
-        try {
-            return jwt.sign(
-                {
-                    userId: this._id.toString(),
-                    email: this.email,
-                   
-                },
-                process.env.JWT_TOKEN,
-                {
-                    expiresIn: "1h",
-                }
-            );
-        } catch (error) {
-            console.error(error);
-        }
-    };
+// json web token
+userSchema.methods.generateToken = async function () {
+    try {
+        return jwt.sign(
+            {
+                userId: this._id.toString(),
+                email: this.email,
+                role: this.role
+
+            },
+            process.env.JWT_TOKEN,
+            {
+                expiresIn: "1h",
+            }
+        );
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 
 
-
-module.exports = mongoose.model("User", userSchema)
+module.exports = mongoose.models.User || mongoose.model('User', userSchema);

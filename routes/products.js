@@ -3,7 +3,7 @@ const router = express.Router();
 const { getAllProducts, findProducts, getAllProductsByID, addReview, getReviews, checkUserReview, addProduct, upload, getmetaData, deleteProduct, editProduct } = require("../controllers/products")
 const { signUp, signIn, getAllUsers, deleteUser,EditUser } = require("../controllers/user")
 const { addtocart, getData, removeData } = require("../controllers/addtocart")
-const { createOrder } = require("../controllers/order")
+const { createOrder, getAllOrders } = require("../controllers/order")
 const { getMessages } = require("../controllers/messages")
 const authmiddleware = require("../middleware/authmiddleware")
 const { checkRole }=require("../middleware/roleMiddleware")
@@ -47,7 +47,9 @@ router.get("/products/:product/getreview", getReviews)
 //check user review
 router.post("/products/checkuser", checkUserReview)
 //order
-router.post('/order', authmiddleware, createOrder)
+router.post('/order', createOrder)
+//getAllOrders
+router.get('/order/getOrders',getAllOrders )
 
 //chat
 router.get("/chat", getMessages)

@@ -1,7 +1,8 @@
 // middlewares/roleMiddleware.js
 
 const checkRole = (roles) => (req, res, next) => {
-    const userRole = req.user.role; // Assuming req.user is populated with user info
+    const userRole = req.headers['role'];
+    // Assuming req.user is populated with user info
     if (roles.includes(userRole)) {
         next();
     } else {

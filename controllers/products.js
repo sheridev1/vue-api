@@ -107,6 +107,7 @@ const getAllProducts = async (req, res) => {
 
     res.status(200).json({ myData })
 }
+
 const findProducts = async (req, res) => {
     const { category, company, featured, name, sort, select, id } = req.query;
     let queryObject = {};
@@ -139,19 +140,24 @@ const findProducts = async (req, res) => {
         apiData = apiData.select(selectFix);
     }
 
+    console.log("limit", req.query.limit);
     let page = Number(req.query.page) || 1;
-    let limit = Number(req.query.limit) || 10;
+    let limit = Number(req.query.limit) || 3;
     let skip = (page - 1) * limit;
 
+    console.log(`Page: ${page}, Limit: ${limit}, Skip: ${skip}`); // Log for debugging
+
     try {
+        const totalDocuments = await Product.countDocuments(queryObject);
         const filteredData = await apiData.skip(skip).limit(limit);
-        console.log("Filtered Data:", filteredData);
-        res.status(200).json({ filteredData, nbHits: filteredData.length });
+       // console.log("Filtered Data:", filteredData);
+        res.status(200).json({ filteredData, nbHits: filteredData.length, total: totalDocuments });
     } catch (err) {
         console.error("Error:", err);
         res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
+
 
 
 

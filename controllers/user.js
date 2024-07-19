@@ -6,7 +6,6 @@ const { editProduct } = require('./products');
 
 const signUp = async (req, res) => {
     const { email, username, password, role } = req.body;
-    console.log(req.body)
 
     if (!username || !email || !password || !role) {
         return res.status(400).json({ error: "Please Fill All Fields" });
@@ -14,11 +13,11 @@ const signUp = async (req, res) => {
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            console.log("User Exist");
             return res.status(400).json({ error: 'User already exists with this email' });
         }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
+       
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
         const newUser = new User({
             username,
             email,
@@ -26,11 +25,9 @@ const signUp = async (req, res) => {
             role
         });
 
-
         await newUser.save();
 
         const token = jwt.sign({ userId: newUser._id, role: newUser.role }, process.env.JWT_TOKEN, { expiresIn: '1h' });
-
 
         res.status(201).json({
             message: "User Created",
@@ -43,6 +40,7 @@ const signUp = async (req, res) => {
         console.log(error);
     }
 };
+
 
 const signIn = async (req, res) => {
     const { email, password } = req.body;
@@ -57,9 +55,12 @@ const signIn = async (req, res) => {
             return res.status(400).json({ error: "Email Not found" });
         }
 
-        const match = await bcrypt.compare(password, user.password);
+        
 
-        if ((user.email == email) && match) {
+        const match = await bcrypt.compare(password, user.password);
+        
+
+        if (match) {
             const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_TOKEN, { expiresIn: '1h' });
 
             res.status(200).json({ message: "Login Success", user: user, token: token });
@@ -67,10 +68,11 @@ const signIn = async (req, res) => {
             return res.status(400).json({ error: "Invalid email or password" });
         }
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Server Error" });
-        console.log(error);
     }
 };
+
 
 
 // GET all users
@@ -105,17 +107,20 @@ const deleteUser = async (req, res) => {
 const EditUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
+        console.log("role",req.params.id)
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         const updates = req.body;
+        console.log("form body", req.body)
 
         // Check if password needs to be updated
         if (updates.password) {
-            const salt = await bcrypt.genSalt(10);
-            updates.password = await bcrypt.hash(updates.password, salt);
+            updates.password= await bcrypt.hash(updates.password, 10);
         }
+
+
 
         Object.assign(user, updates);
         await user.save();

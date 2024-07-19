@@ -7,17 +7,13 @@ const jwt = require("jsonwebtoken");
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: [true, "Please provide a username"],
+    required: true,
     unique: true,
   },
-  password: {
-    type: String,
-    required: [true, "Please Enter a Password "],
-    minlength: 8,
-  },
+  password: { type: String, required: true, unique: false, maxlength: 60 },
   email: {
     type: String,
-    required: [true, "Please Enter a Email"],
+    required: true,
     unique: true,
     match: [
       /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
@@ -38,18 +34,7 @@ const userSchema = new mongoose.Schema({
   // ]
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    return next();
-  }
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    //user.password = hashPassword;
-  } catch (error) {
-    next(error);
-  }
-});
+
 
 // json web token
 userSchema.methods.generateToken = async function () {
